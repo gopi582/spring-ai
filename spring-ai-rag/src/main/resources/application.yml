@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: spring-ai-rag
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vectordb
+    username: postgres
+    password: postgres
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+
+      chat:
+        options:
+          model: qwen2.5:3b
+
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
