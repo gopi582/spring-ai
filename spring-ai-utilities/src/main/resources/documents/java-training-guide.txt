@@ -1,0 +1,44 @@
+Java Full Stack Training Program
+
+Module 1: Core Java
+- Variables
+- Data Types
+- Operators
+- Control Statements
+- Arrays
+- Methods
+- OOP Concepts
+
+Module 2: Advanced Java
+- Collections
+- Generics
+- Exception Handling
+- Multithreading
+- Streams API
+- Functional Interfaces
+
+Module 3: Spring Framework
+- Dependency Injection
+- Bean Lifecycle
+- Spring MVC
+- Spring Boot
+- Spring Data JPA
+
+Module 4: Microservices
+- Service Discovery
+- API Gateway
+- Config Server
+- Circuit Breaker
+
+Module 5: Cloud & DevOps
+- Docker
+- Kubernetes
+- Jenkins
+- AWS
+
+Module 6: AI Integration
+- Spring AI
+- Ollama
+- Prompt Engineering
+- Tool Calling
+- RAG Applications

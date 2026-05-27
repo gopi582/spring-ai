@@ -1,0 +1,22 @@
+{
+  "company": "ABC Technologies",
+  "employee": {
+    "id": 101,
+    "name": "John Doe",
+    "designation": "Senior Java Developer",
+    "department": "IT",
+    "salary": 75000,
+    "skills": [
+      "Java",
+      "Spring Boot",
+      "Microservices",
+      "Docker",
+      "Kubernetes"
+    ],
+    "address": {
+      "city": "Hyderabad",
+      "state": "Telangana",
+      "country": "India"
+    }
+  }
+}
