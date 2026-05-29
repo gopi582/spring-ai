@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: spring-ai-mcp-mongo-shopping-cart
+
+  main:
+    banner-mode: off
+    web-application-type: none
+    
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/shoppingdb
+
+  ai:
+    mcp:
+      server:
+        name: shopping-cart-server
+        version: 1.0.0
+        type: SYNC
+        stdio: true
+
+logging:
+  level:
+    root: OFF
