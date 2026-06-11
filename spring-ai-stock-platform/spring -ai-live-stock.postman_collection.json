@@ -1,0 +1,134 @@
+{
+  "info": {
+    "_postman_id": "90d754d1-8dfa-4d07-978c-4dac1ee94ee7",
+    "name": "spring -ai-live-stock",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33693312"
+  },
+  "item": [
+    {
+      "name": "getToken",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/auth/token?user=gopi",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "auth",
+            "token"
+          ],
+          "query": [
+            {
+              "key": "user",
+              "value": "gopi"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "ask",
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnb3BpIiwiaWF0IjoxNzgxMDcyOTM1LCJleHAiOjE3ODEwNzY1MzV9.pyDA3gN8tvQvak1e9WoDtBafhNXd0FLwvxD-4HSZtHw",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/ai/ask?q=What is Tesla stock price?",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "ai",
+            "ask"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "What is Tesla stock price?"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "upload",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "uuid": "92b7c7ae-3d57-4956-b806-f2de809e7970",
+              "src": "/C:/Users/gopir/OneDrive/Desktop/Stock Market Knowledge Base.pdf"
+            }
+          ]
+        },
+        "url": {
+          "raw": "http://localhost:8081/documents/upload",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8081",
+          "path": [
+            "documents",
+            "upload"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "chat",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJnb3BpIiwiaWF0IjoxNzgxMDcxNzQwLCJleHAiOjE3ODEwNzUzNDB9.NMbtfnKXPDL1NiPQ0ZD28tpUL53GEbvwQcMR816YXyU",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/ai/chat?q=What is the stock price of AAPL?",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "ai",
+            "chat"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "What is the stock price of AAPL?"
+            }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
