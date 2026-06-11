@@ -6,3 +6,4 @@ As part of thhis below coding activities were performed,
 4. Shopping cart application using Claude MCP as part of **spring-ai-mcp-mongo-shopping-cart**
 5. MCP client with AI Agent to acees the shoping cart app from MCP Server as part of **spring-ai-mcp-client-shopping-cart**
 6. Simpe Spring AI application to validate ai agent **spring-ai-agent**
+7. Online live stock rates y using MCP Server, MCP Client, RAG, JWT, Redis cahing as part of **spring-ai-stock-platform**
