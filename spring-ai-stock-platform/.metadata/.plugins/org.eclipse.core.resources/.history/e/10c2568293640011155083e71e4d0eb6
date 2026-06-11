@@ -1,0 +1,119 @@
+package com.spring.ai.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/ai")
+public class AgentController {
+
+	private final ChatClient chatClient;
+	private final ChatMemory chatMemory;
+	private final VectorStore vectorStore;
+	private final ToolCallbackProvider toolCallbackProvider;
+
+	public AgentController(ChatClient.Builder builder, ChatMemory chatMemory, VectorStore vectorStore) {
+
+		this.chatClient = builder.build();
+		this.chatMemory = chatMemory;
+		this.vectorStore = vectorStore;
+	}
+
+	@GetMapping("/ask")
+	public String ask(@RequestParam("q") String q, @RequestParam(value = "sessionId", defaultValue = "1") String sessionId) {
+
+		String lower = q.toLowerCase();
+
+		boolean priceQuery = lower.contains("price") || lower.contains("stock price") || lower.contains("share price")
+				|| lower.contains("quote");
+
+		boolean newsQuery = lower.contains("news") || lower.contains("headline");
+
+		boolean companyQuery = lower.contains("company") || lower.contains("profile") || lower.contains("about");
+
+		boolean marketQuery = lower.contains("gainers") || lower.contains("losers") || lower.contains("market movers");
+
+		boolean ragQuery = !priceQuery && !newsQuery && !companyQuery && !marketQuery;
+
+		String systemPrompt = """
+				You are a Zero Hallucination Stock AI Agent.
+
+				Rules:
+
+				1. Stock prices MUST come from STOCK PRICE tools.
+				2. Company information MUST come from COMPANY tools.
+				3. News MUST come from NEWS tools.
+				4. Market movers MUST come from MARKET MOVERS tools.
+				5. Never invent values.
+				6. If a tool does not return data, say:
+				   'No live data available.'
+				7. Return tool output exactly as received.
+				""";
+
+		if (priceQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use STOCK PRICE tools.
+					Do not use RAG knowledge.
+					Return only live stock price information.
+					""";
+		} else if (newsQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use NEWS tools.
+					Do not use RAG knowledge.
+					Return only latest news.
+					""";
+		} else if (companyQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use COMPANY tools.
+					Do not use RAG knowledge.
+					Return only company profile information.
+					""";
+		} else if (marketQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use MARKET MOVERS tools.
+					Do not use RAG knowledge.
+					Return only market movers information.
+					""";
+		}
+
+		// RAG path
+		if (ragQuery) {
+
+			return chatClient.prompt().system(systemPrompt).user(q)
+					.advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(sessionId).build(),
+
+							QuestionAnswerAdvisor.builder(vectorStore).build())
+					.call().content();
+		}
+
+		// Tool path
+		return chatClient.prompt().system(systemPrompt).user(q)
+				.advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(sessionId).build()).call()
+				.content();
+	}
+	
+	@GetMapping("/chat")
+    public String chat(@RequestParam("q") String q) {
+
+        return chatClient.prompt()
+                .user(q)
+                .toolCallbacks(toolCallbackProvider.getToolCallbacks()
+                .call()
+                .content();
+    }
+}

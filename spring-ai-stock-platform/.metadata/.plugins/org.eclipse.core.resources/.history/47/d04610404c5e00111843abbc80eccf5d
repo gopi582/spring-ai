@@ -1,0 +1,38 @@
+package com.spring.ai.filter;
+
+@Component
+public class JwtFilter implements GatewayFilter {
+
+    private final String SECRET = "my-secret-key-my-secret-key";
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
+        String authHeader = exchange.getRequest()
+                .getHeaders()
+                .getFirst("Authorization");
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return unauthorized(exchange);
+        }
+
+        String token = authHeader.substring(7);
+
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(SECRET.getBytes())
+                    .build()
+                    .parseClaimsJws(token);
+
+        } catch (Exception e) {
+            return unauthorized(exchange);
+        }
+
+        return chain.filter(exchange);
+    }
+
+    private Mono<Void> unauthorized(ServerWebExchange exchange) {
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        return exchange.getResponse().setComplete();
+    }
+}

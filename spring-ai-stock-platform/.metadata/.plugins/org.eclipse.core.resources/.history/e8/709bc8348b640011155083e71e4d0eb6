@@ -1,0 +1,13 @@
+package com.spring.ai.service;
+
+@Component
+public class McpClientInspector {
+
+    public McpClientInspector(List<ToolCallback> tools) {
+
+        System.out.println("===== CLIENT TOOLS =====");
+
+        tools.forEach(tool ->
+                System.out.println(tool.getToolDefinition().name()));
+    }
+}

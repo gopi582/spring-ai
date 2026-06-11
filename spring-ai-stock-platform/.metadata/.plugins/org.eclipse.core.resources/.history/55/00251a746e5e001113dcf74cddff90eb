@@ -1,0 +1,37 @@
+package com.spring.ai.config;
+
+import org.springframework.ai.chat.client.ChatClient;
+
+import org.springframework.ai.tool.ToolCallbackProvider;
+
+import org.springframework.context.annotation.Bean;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AgentConfig {
+	@Bean
+	ChatClient chatClient(
+
+			ChatClient.Builder builder,
+
+			SyncMcpToolCallbackProvider toolCallbackProvider) {
+
+		return builder
+
+				.defaultSystem("""
+						You are a stock market AI assistant.
+
+						RULES:
+						- ALWAYS use tools for live stock prices
+						- NEVER answer stock prices from memory
+						- Use RAG only for stock knowledge
+						""")
+
+				.defaultToolCallbacks(
+
+						toolCallbackProvider.getToolCallbacks())
+
+				.build();
+	}
+}

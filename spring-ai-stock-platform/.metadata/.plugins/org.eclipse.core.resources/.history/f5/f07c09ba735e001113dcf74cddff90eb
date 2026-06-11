@@ -1,0 +1,26 @@
+package com.spring.ai.stock;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MarketMoversTools {
+
+    private final StockService stockService;
+
+    public MarketMoversTools(StockService stockService) {
+        this.stockService = stockService;
+    }
+
+    @Tool(description = "Get top market gainers")
+    public String topGainers() {
+
+        return stockService.topGainers();
+    }
+
+    @Tool(description = "Get top market losers")
+    public String topLosers() {
+
+        return stockService.topLosers();
+    }
+}

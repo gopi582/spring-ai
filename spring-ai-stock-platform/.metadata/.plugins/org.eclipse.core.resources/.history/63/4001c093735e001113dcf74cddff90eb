@@ -1,0 +1,22 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.MarketMoversService;
+
+@Component
+public class MarketMoversTools {
+
+    private final MarketMoversService service;
+
+    public MarketMoversTools(MarketMoversService service) {
+        this.service = service;
+    }
+
+    @Tool(description = "Get top market movers")
+    public String topMovers() {
+
+        return service.movers();
+    }
+}

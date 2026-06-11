@@ -1,0 +1,32 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+@Component
+public class NewsTools {
+
+    private final NewsService newsService;
+
+    public NewsTools(NewsService newsService) {
+        this.newsService = newsService;
+    }
+
+    @Tool(description = """
+            Get latest stock market news or company news.
+
+            Use ONLY for:
+            - latest news
+            - company updates
+            - recent announcements
+            - breaking market news
+
+            Examples:
+            - Latest Tesla news
+            - Apple recent announcements
+            - NVIDIA latest updates
+            """)
+    public String latestNews(String company) {
+        return newsService.getNews(company);
+    }
+}

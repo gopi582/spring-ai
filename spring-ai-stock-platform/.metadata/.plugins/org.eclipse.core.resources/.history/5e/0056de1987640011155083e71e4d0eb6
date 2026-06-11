@@ -1,0 +1,32 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.StockService;
+
+@Component
+public class StockTools {
+
+    private final StockService stockService;
+
+    public StockTools(StockService stockService) {
+        this.stockService = stockService;
+    }
+
+    @Tool(description = """
+            Get LIVE stock price for a company ticker.
+
+            Use ONLY for:
+            - stock price
+            - share price
+            - current trading value
+
+            Examples:
+            - What is AAPL stock price?
+            - Tesla share price
+            """)
+    public String stockPrice(String symbol) {
+        return stockService.getPrice(symbol);
+    }
+}

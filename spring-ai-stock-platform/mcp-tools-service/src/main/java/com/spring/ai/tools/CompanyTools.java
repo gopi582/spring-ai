@@ -1,0 +1,34 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.CompanyService;
+
+@Component
+public class CompanyTools {
+
+	private final CompanyService companyService;
+
+	public CompanyTools(CompanyService companyService) {
+		this.companyService = companyService;
+	}
+
+	@Tool(description = """
+			Get company profile and business information.
+
+			Use ONLY for:
+			- company details
+			- CEO
+			- sector
+			- employees
+			- description
+
+			Examples:
+			- Tell me about Tesla
+			- Apple company profile
+			""")
+	public String companyInfo(String symbol) {
+		return companyService.companyProfile(symbol);
+	}
+}

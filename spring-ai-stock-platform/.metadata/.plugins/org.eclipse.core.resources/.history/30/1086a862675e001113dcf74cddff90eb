@@ -1,0 +1,31 @@
+package com.spring.ai.controller;
+
+import com.spring.ai.util.JwtUtil;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
+
+    private final JwtUtil jwtUtil;
+
+    public AuthController(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @PostMapping("/token")
+    public Map<String, String> token(
+            @RequestParam String("user") user
+    ) {
+
+        String token = jwtUtil.generateToken(user);
+
+        return Map.of(
+                "token",
+                token
+        );
+    }
+}

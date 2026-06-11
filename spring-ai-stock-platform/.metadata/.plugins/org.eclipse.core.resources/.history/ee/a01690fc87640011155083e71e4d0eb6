@@ -1,0 +1,21 @@
+server:
+  port: 8082
+
+spring:
+  cache:
+    type: redis
+  ai:
+    mcp:
+      server:
+        name: stock-tools
+        version: 1.0.0
+        enabled: true
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+stock:
+  api:
+    key: dc663c101c4a42e9867b315e2e187b1e

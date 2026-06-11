@@ -1,0 +1,31 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.StockService;
+
+@Component
+public class StockTools {
+
+	private final StockService stockService;
+
+	public StockTools(StockService stockService) {
+		this.stockService = stockService;
+	}
+
+	@Tool(description = """
+			    Get the LIVE stock price for a ticker symbol.
+			Examples:
+			- AAPL
+			- TSLA
+			- ORCL
+			- NVDA
+			Returns real-time market data from TwelveData.
+			    """)
+	public String stockPrice(String symbol) {
+		System.out.println("===== STOCK TOOL EXECUTED =====");
+		System.out.println("Requested Symbol = " + symbol);
+		return stockService.getPrice(symbol);
+	}
+}

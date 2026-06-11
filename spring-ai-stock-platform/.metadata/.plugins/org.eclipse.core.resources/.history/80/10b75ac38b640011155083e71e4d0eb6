@@ -1,0 +1,19 @@
+package com.spring.ai.controller;
+
+@RestController
+@RequestMapping("/debug")
+public class DebugController {
+
+    private final ToolCallbackProvider toolProvider;
+
+    public DebugController(ToolCallbackProvider toolProvider) {
+        this.toolProvider = toolProvider;
+    }
+
+    @GetMapping("/tools")
+    public String tools() {
+
+        return "Tool Provider Loaded: " +
+                toolProvider.getToolCallbacks().length;
+    }
+}

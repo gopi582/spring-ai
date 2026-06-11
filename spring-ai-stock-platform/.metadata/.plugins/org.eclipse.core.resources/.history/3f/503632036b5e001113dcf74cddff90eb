@@ -1,0 +1,23 @@
+package com.spring.ai.config;
+
+package com.mcp.tools.config;
+
+import com.mcp.tools.stock.StockTools;
+
+import org.springframework.ai.tool.ToolCallbackProvider;
+
+import org.springframework.context.annotation.Bean;
+
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class McpToolConfig {
+
+    @Bean
+    ToolCallbackProvider tools(
+            StockTools stockTools
+    ) {
+
+        return ToolCallbackProvider.from(stockTools);
+    }
+}

@@ -1,0 +1,34 @@
+package com.spring.ai.service;
+
+import java.util.List;
+
+import org.springframework.ai.tool.ToolCallback;
+import org.springframework.stereotype.Component;
+
+import jakarta.annotation.PostConstruct;
+
+@Component
+public class McpClientInspector {
+
+	private final List<ToolCallback> tools;
+
+	public McpClientInspector(List<ToolCallback> tools) {
+		this.tools = tools;
+	}
+
+	@PostConstruct
+	public void printTools() {
+
+		System.out.println("\n===== MCP CLIENT TOOLS =====");
+
+		tools.forEach(tool -> {
+			try {
+				System.out.println(tool.getToolDefinition().name());
+			} catch (Exception e) {
+				System.out.println(tool);
+			}
+		});
+
+		System.out.println("============================\n");
+	}
+}

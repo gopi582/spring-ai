@@ -1,0 +1,20 @@
+package com.spring.ai.stock;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+@Component
+public class NewsTools {
+
+    private final NewsService newsService;
+
+    public NewsTools(NewsService newsService) {
+        this.newsService = newsService;
+    }
+
+    @Tool(description = "Get latest stock news")
+    public String stockNews(String symbol) {
+
+        return newsService.getNews(symbol);
+    }
+}

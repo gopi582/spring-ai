@@ -1,0 +1,23 @@
+package com.spring.ai.tools;
+
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.CompanyService;
+
+@Component
+public class CompanyTools {
+
+    private final CompanyService companyService;
+
+    public CompanyTools(CompanyService companyService) {
+        this.companyService = companyService;
+    }
+
+    @Tool(description = "Get company overview")
+    public String companyOverview(String symbol) {
+
+        return companyService.companyInfo(symbol);
+    }
+}

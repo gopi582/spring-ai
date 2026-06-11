@@ -1,0 +1,28 @@
+package com.spring.ai.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Service
+public class CompanyService {
+
+	private final WebClient webClient;
+
+	@Value("${stock.api.key}")
+	private String apiKey;
+
+	public CompanyService(WebClient.Builder builder) {
+		this.webClient = builder.baseUrl("https://api.twelvedata.com").build();
+	}
+
+	public String companyInfo(String symbol) {
+		return webClient.get()
+
+				.uri(uriBuilder -> uriBuilder.path("/stocks").queryParam("symbol", symbol).queryParam("apikey", apiKey)
+						.build())
+				.retrieve()
+				.bodyToMono(String.class)
+				.block();
+	}
+}

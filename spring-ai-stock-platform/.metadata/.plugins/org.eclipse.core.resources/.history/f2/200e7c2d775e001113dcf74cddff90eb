@@ -1,0 +1,106 @@
+package com.spring.ai.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/ai")
+public class AgentController {
+
+    private final ChatClient chatClient;
+
+    private final ChatMemory chatMemory;
+
+    private final VectorStore vectorStore;
+
+    public AgentController(
+            ChatClient.Builder builder,
+            ChatMemory chatMemory,
+            VectorStore vectorStore) {
+
+        this.chatClient = builder.build();
+        this.chatMemory = chatMemory;
+        this.vectorStore = vectorStore;
+    }
+
+    @GetMapping("/ask")
+    public String ask(
+            @RequestParam("q") String q,
+            @RequestParam(defaultValue = "1") String sessionId) {
+
+        String lower = q.toLowerCase();
+
+        boolean liveStockQuery =
+                lower.contains("stock")
+                        || lower.contains("price")
+                        || lower.contains("market")
+                        || lower.contains("gainers")
+                        || lower.contains("losers")
+                        || lower.contains("news")
+                        || lower.contains("company");
+
+        /*
+         * LIVE STOCK QUESTIONS
+         * → USE MCP TOOLS ONLY
+         */
+
+        if (liveStockQuery) {
+
+            return chatClient.prompt()
+
+                    .advisors(
+                            MessageChatMemoryAdvisor.builder(chatMemory)
+                                    .conversationId(sessionId)
+                                    .build())
+
+                    .system("""
+                            You are an enterprise stock AI assistant.
+
+                            IMPORTANT:
+                            - ALWAYS use MCP tools for live stock data
+                            - NEVER use prior context for stock prices
+                            - NEVER say 'context does not contain'
+                            - Return concise answers
+                            """)
+
+                    .user(q)
+
+                    .call()
+
+                    .content();
+        }
+
+        /*
+         * DOCUMENT QUESTIONS
+         * → USE RAG
+         */
+
+        return chatClient.prompt()
+
+                .advisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory)
+                                .conversationId(sessionId)
+                                .build(),
+
+                        QuestionAnswerAdvisor.builder(vectorStore).build())
+
+                .system("""
+                        You are an enterprise RAG assistant.
+
+                        Use only document context.
+                        """)
+
+                .user(q)
+
+                .call()
+
+                .content();
+    }
+}

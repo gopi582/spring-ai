@@ -1,0 +1,44 @@
+package com.spring.ai;
+
+import java.util.List;
+
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+
+import io.modelcontextprotocol.client.McpSyncClient;
+
+@SpringBootApplication
+public class AiAgentServiceApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(AiAgentServiceApplication.class, args);
+	}
+	
+	@Bean
+	ApplicationRunner verifyMcpClients(List<McpSyncClient> clients) {
+	    return args -> {
+
+	        System.out.println("CLIENT COUNT = " + clients.size());
+
+	        for (McpSyncClient client : clients) {
+
+	            System.out.println("SERVER INFO = " + client.getServerInfo());
+
+	            try {
+	                var response = client.listTools();
+
+	                System.out.println("TOOLS:");
+
+	                response.tools().forEach(tool ->
+	                    System.out.println(" - " + tool.name()));
+
+	            } catch (Exception e) {
+	                e.printStackTrace();
+	            }
+	        }
+	    };
+	}
+	
+}

@@ -1,0 +1,80 @@
+package com.spring.ai.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.vectorstore.VectorStore;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/ai")
+public class AgentController {
+
+    private final ChatClient chatClient;
+
+    private final ChatMemory chatMemory;
+
+    private final VectorStore vectorStore;
+
+    public AgentController(
+
+            ChatClient.Builder builder,
+
+            ChatMemory chatMemory,
+
+            VectorStore vectorStore
+    ) {
+
+        this.chatClient = builder.build();
+
+        this.chatMemory = chatMemory;
+
+        this.vectorStore = vectorStore;
+    }
+
+    @GetMapping("/ask")
+    public String ask(
+
+            @RequestParam("q") String q,
+
+            @RequestParam(
+                    value = "sessionId",
+                    defaultValue = "1"
+            )
+            String sessionId
+    ) {
+
+        return chatClient.prompt()
+
+                .advisors(
+
+                        MessageChatMemoryAdvisor
+                                .builder(chatMemory)
+                                .conversationId(sessionId)
+                                .build(),
+
+                        QuestionAnswerAdvisor
+                                .builder(vectorStore)
+                                .build()
+                )
+
+                .system("""
+                        You are an enterprise stock market AI assistant.
+
+                        Use:
+                        - RAG for stock knowledge
+                        - MCP tools for live stock prices
+                        """)
+
+                .user(q)
+
+                .call()
+
+                .content();
+    }
+}

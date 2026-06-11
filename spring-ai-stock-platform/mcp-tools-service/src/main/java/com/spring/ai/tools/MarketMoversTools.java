@@ -1,0 +1,26 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.MarketMoversService;
+
+@Component
+public class MarketMoversTools {
+
+	private final MarketMoversService service;
+
+	public MarketMoversTools(MarketMoversService service) {
+		this.service = service;
+	}
+
+	@Tool(description = "Fetch real-time top gaining stocks in the US market. Returns a ranked list with symbol, price change, and percentage gain.")
+	public String topMovers() {
+		return service.topGainers();
+	}
+
+	@Tool(description = "Fetch real-time top losing stocks in the US market. Returns a ranked list with symbol, price change, and percentage loss.")
+	public String topLosers() {
+		return service.topLosers();
+	}
+}

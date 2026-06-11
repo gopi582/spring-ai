@@ -1,0 +1,40 @@
+server:
+  port: 8081
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stockdb
+    username: postgres
+    password: postgres
+
+  ai:
+
+    ollama:
+      base-url: http://localhost:11434
+
+      chat:
+        options:
+          model: qwen2.5:3b
+
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    mcp:
+      client:
+        enabled: true
+        sse:
+          connections:
+            stock-tools:
+              url: http://localhost:8082
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always

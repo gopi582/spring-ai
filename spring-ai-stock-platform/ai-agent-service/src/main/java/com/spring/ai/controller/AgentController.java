@@ -1,0 +1,135 @@
+package com.spring.ai.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/ai")
+public class AgentController {
+
+    private final ChatClient chatClient;
+    private final ChatMemory chatMemory;
+    private final VectorStore vectorStore;
+    private final ToolCallbackProvider toolCallbackProvider;
+
+    public AgentController(
+            ChatClient.Builder builder,
+            ChatMemory chatMemory,
+            VectorStore vectorStore,
+            ToolCallbackProvider toolCallbackProvider) {
+
+        this.chatClient = builder.build();
+        this.chatMemory = chatMemory;
+        this.vectorStore = vectorStore;
+        this.toolCallbackProvider = toolCallbackProvider;
+    }
+
+    @GetMapping("/ask")
+    public String ask(
+            @RequestParam("q") String q,
+            @RequestParam(value = "sessionId", defaultValue = "default") String sessionId) {
+
+        String lower = q.toLowerCase();
+
+        boolean stockQuery =
+                lower.contains("price")
+                        || lower.contains("stock")
+                        || lower.contains("share")
+                        || lower.contains("quote")
+                        || lower.contains("aapl")
+                        || lower.contains("tsla")
+                        || lower.contains("msft")
+                        || lower.contains("nvda");
+
+        boolean newsQuery =
+                lower.contains("news")
+                        || lower.contains("headline")
+                        || lower.contains("latest");
+
+        boolean companyQuery =
+                lower.contains("company")
+                        || lower.contains("profile")
+                        || lower.contains("about");
+
+        boolean moversQuery =
+                lower.contains("gainers")
+                        || lower.contains("losers")
+                        || lower.contains("market movers")
+                        || lower.contains("top movers");
+
+        boolean toolQuery =
+                stockQuery
+                        || newsQuery
+                        || companyQuery
+                        || moversQuery;
+
+        String systemPrompt = """
+                You are a Stock Market AI Assistant.
+
+                IMPORTANT RULES:
+
+                1. For stock prices use stockPrice tool.
+                2. For company information use companyInfo tool.
+                3. For stock market news use latestNews tool.
+                4. For gainers/losers use topMovers or topLosers tool.
+                5. Never invent stock values.
+                6. Always prefer tool results over model knowledge.
+                7. If tool returns no data, reply:
+                   "No live data available."
+                8. Return tool data exactly as received.
+                """;
+
+        // ---------- TOOL PATH ----------
+        if (toolQuery) {
+
+            return chatClient.prompt()
+                    .system(systemPrompt)
+                    .user(q)
+                    .toolCallbacks(toolCallbackProvider.getToolCallbacks())
+                    .advisors(
+                            MessageChatMemoryAdvisor.builder(chatMemory)
+                                    .conversationId(sessionId)
+                                    .build())
+                    .call()
+                    .content();
+        }
+
+        // ---------- RAG PATH ----------
+        return chatClient.prompt()
+                .system("""
+                        You are a helpful assistant.
+
+                        Use document knowledge when available.
+                        Use conversation history when relevant.
+                        If information is unavailable, say so.
+                        """)
+                .user(q)
+                .toolCallbacks(toolCallbackProvider.getToolCallbacks())
+                .advisors(
+                        MessageChatMemoryAdvisor.builder(chatMemory)
+                                .conversationId(sessionId)
+                                .build(),
+                        QuestionAnswerAdvisor.builder(vectorStore)
+                                .build())
+                .call()
+                .content();
+    }
+
+    @GetMapping("/chat")
+    public String chat(@RequestParam("q") String q) {
+
+        return chatClient.prompt()
+                .user(q)
+                .toolCallbacks(toolCallbackProvider.getToolCallbacks())
+                .call()
+                .content();
+    }
+}

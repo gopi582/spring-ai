@@ -1,0 +1,28 @@
+package com.spring.ai.util;
+
+@Component
+public class JwtUtil {
+
+    private final String SECRET = "my-secret-key-my-secret-key";
+
+    public String generateToken(String user) {
+        return Jwts.builder()
+                .setSubject(user)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+                .signWith(Keys.hmacShaKeyFor(SECRET.getBytes()))
+                .compact();
+    }
+
+    public boolean validate(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(SECRET.getBytes())
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}

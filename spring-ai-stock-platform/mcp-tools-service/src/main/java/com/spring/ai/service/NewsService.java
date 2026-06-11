@@ -1,0 +1,38 @@
+package com.spring.ai.service;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+
+@Service
+public class NewsService {
+
+    private final WebClient webClient;
+
+    @Value("${stock.api.key}")
+    private String apiKey;
+
+    public NewsService(WebClient.Builder builder) {
+
+        this.webClient = builder
+                .baseUrl("https://api.twelvedata.com")
+                .build();
+    }
+
+    public String latestNews(String symbol) {
+
+        return webClient.get()
+
+                .uri(uriBuilder ->
+                        uriBuilder.path("/news")
+                                .queryParam("symbol", symbol)
+                                .queryParam("apikey", apiKey)
+                                .build())
+
+                .retrieve()
+
+                .bodyToMono(String.class)
+
+                .block();
+    }
+}

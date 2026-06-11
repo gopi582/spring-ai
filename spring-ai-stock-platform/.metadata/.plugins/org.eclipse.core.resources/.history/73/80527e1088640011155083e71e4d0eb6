@@ -1,0 +1,17 @@
+package com.spring.ai.service;
+
+@Component
+public class BeanChecker {
+
+    public BeanChecker(
+            StockTools stockTools,
+            CompanyTools companyTools,
+            NewsTools newsTools,
+            MarketMoversTools marketMoversTools) {
+
+        System.out.println("StockTools bean created");
+        System.out.println("CompanyTools bean created");
+        System.out.println("NewsTools bean created");
+        System.out.println("MarketMoversTools bean created");
+    }
+}

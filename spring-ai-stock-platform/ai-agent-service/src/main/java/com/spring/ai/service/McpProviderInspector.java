@@ -1,0 +1,27 @@
+package com.spring.ai.service;
+
+import jakarta.annotation.PostConstruct;
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+public class McpProviderInspector {
+
+	private final List<ToolCallbackProvider> providers;
+
+	public McpProviderInspector(List<ToolCallbackProvider> providers) {
+		this.providers = providers;
+	}
+
+	@PostConstruct
+	public void inspect() {
+
+		System.out.println("\n===== TOOL PROVIDERS =====");
+
+		providers.forEach(provider -> System.out.println(provider.getClass().getName()));
+
+		System.out.println("==========================");
+	}
+}

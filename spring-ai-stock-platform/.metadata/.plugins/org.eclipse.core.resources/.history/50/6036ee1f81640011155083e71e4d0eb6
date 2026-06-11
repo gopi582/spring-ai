@@ -1,0 +1,5 @@
+package com.spring.ai.config;
+
+public class RagDocumentLoader {
+
+}

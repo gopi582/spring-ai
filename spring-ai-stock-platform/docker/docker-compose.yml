@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+
+  # =========================
+  # POSTGRES + PGVECTOR
+  # =========================
+  postgres:
+    image: pgvector/pgvector:pg17
+
+    container_name: pgvector-db
+
+    environment:
+      POSTGRES_DB: stockdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+    restart: always
+
+  # =========================
+  # REDIS CACHE
+  # =========================
+  redis:
+    image: redis:7-alpine
+
+    container_name: redis-cache
+
+    ports:
+      - "6379:6379"
+
+    command: redis-server --appendonly yes
+
+    volumes:
+      - redisdata:/data
+
+    restart: always
+
+volumes:
+  pgdata:
+  redisdata:

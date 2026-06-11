@@ -1,0 +1,49 @@
+server:
+  port: 8081
+
+spring:
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stockdb
+    username: postgres
+    password: postgres
+    
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+
+      chat:
+        options:
+          model: llama3.1:8b
+
+      embedding:
+        options:
+          model: nomic-embed-text
+
+    mcp:
+      client:
+        enabled: true
+        type: SYNC
+        sse:
+          connections:
+            stock-tools:
+              url: http://localhost:8082/sse
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true
+
+    chat:
+      memory:
+        repository:
+          jdbc:
+            initialize-schema: always
+            
+logging:
+  level:
+    org.springframework.ai.mcp: DEBUG

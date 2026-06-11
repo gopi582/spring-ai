@@ -1,0 +1,21 @@
+package com.spring.ai.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class MarketMoversService {
+
+	public String movers() {
+
+		return """
+				Top Market Movers Today:
+
+				NVDA +5.3%
+				TSLA -2.1%
+				AAPL +1.8%
+				META +3.4%
+				""";
+	}
+	
+	
+}

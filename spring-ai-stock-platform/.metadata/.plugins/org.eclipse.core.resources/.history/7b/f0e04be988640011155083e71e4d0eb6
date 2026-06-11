@@ -1,0 +1,31 @@
+package com.spring.ai.config;
+
+import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.method.MethodToolCallbackProvider;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import com.spring.ai.tools.CompanyTools;
+import com.spring.ai.tools.MarketMoversTools;
+import com.spring.ai.tools.NewsTools;
+import com.spring.ai.tools.StockTools;
+
+@Configuration
+public class McpToolConfig {
+
+    @Bean
+    ToolCallbackProvider toolCallbackProvider(
+            StockTools stockTools,
+            CompanyTools companyTools,
+            NewsTools newsTools,
+            MarketMoversTools marketMoversTools) {
+
+        return MethodToolCallbackProvider.builder()
+                .toolObjects(
+                        stockTools,
+                        companyTools,
+                        newsTools,
+                        marketMoversTools)
+                .build();
+    }
+}

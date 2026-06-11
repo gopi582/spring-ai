@@ -1,0 +1,22 @@
+package com.spring.ai.service;
+
+import java.util.Arrays;
+
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ToolInspector {
+
+	public ToolInspector(ApplicationContext context) {
+
+		context.getBeansWithAnnotation(Component.class).values().forEach(bean -> {
+
+			System.out.println("Bean = " + bean.getClass().getName());
+
+			Arrays.stream(bean.getClass().getMethods())
+					.filter(m -> m.isAnnotationPresent(org.springframework.ai.tool.annotation.Tool.class))
+					.forEach(m -> System.out.println(" TOOL FOUND -> " + m.getName()));
+		});
+	}
+}

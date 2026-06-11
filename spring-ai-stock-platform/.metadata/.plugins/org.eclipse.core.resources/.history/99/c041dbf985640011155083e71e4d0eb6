@@ -1,0 +1,110 @@
+package com.spring.ai.controller;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/ai")
+public class AgentController {
+
+	private final ChatClient chatClient;
+	private final ChatMemory chatMemory;
+	private final VectorStore vectorStore;
+
+	public AgentController(ChatClient.Builder builder, ChatMemory chatMemory, VectorStore vectorStore) {
+
+		this.chatClient = builder.build();
+		this.chatMemory = chatMemory;
+		this.vectorStore = vectorStore;
+	}
+
+	@GetMapping("/ask")
+	public String ask(@RequestParam("q") String q, @RequestParam(value = "sessionId", defaultValue = "1") String sessionId) {
+
+		String lower = q.toLowerCase();
+
+		boolean priceQuery = lower.contains("price") || lower.contains("stock price") || lower.contains("share price")
+				|| lower.contains("quote");
+
+		boolean newsQuery = lower.contains("news") || lower.contains("headline");
+
+		boolean companyQuery = lower.contains("company") || lower.contains("profile") || lower.contains("about");
+
+		boolean marketQuery = lower.contains("gainers") || lower.contains("losers") || lower.contains("market movers");
+
+		boolean ragQuery = !priceQuery && !newsQuery && !companyQuery && !marketQuery;
+
+		String systemPrompt = """
+				You are a Zero Hallucination Stock AI Agent.
+
+				Rules:
+
+				1. Use STOCK PRICE tools only for stock price questions.
+				2. Use NEWS tools only for news questions.
+				3. Use COMPANY tools only for company profile questions.
+				4. Use MARKET MOVERS tools only for market movers questions.
+				5. Use RAG only for stock market knowledge questions.
+				6. Never mix tool results with RAG content.
+				7. Never invent prices, news, company information or market data.
+				8. If tool data is available, answer only from the tool result.
+				9. If tool data is unavailable, say so explicitly.
+				10. Keep responses concise and factual.
+				""";
+
+		if (priceQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use STOCK PRICE tools.
+					Do not use RAG knowledge.
+					Return only live stock price information.
+					""";
+		} else if (newsQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use NEWS tools.
+					Do not use RAG knowledge.
+					Return only latest news.
+					""";
+		} else if (companyQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use COMPANY tools.
+					Do not use RAG knowledge.
+					Return only company profile information.
+					""";
+		} else if (marketQuery) {
+			systemPrompt += """
+
+					IMPORTANT:
+					Use MARKET MOVERS tools.
+					Do not use RAG knowledge.
+					Return only market movers information.
+					""";
+		}
+
+		// RAG path
+		if (ragQuery) {
+
+			return chatClient.prompt().system(systemPrompt).user(q)
+					.advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(sessionId).build(),
+
+							QuestionAnswerAdvisor.builder(vectorStore).build())
+					.call().content();
+		}
+
+		// Tool path
+		return chatClient.prompt().system(systemPrompt).user(q)
+				.advisors(MessageChatMemoryAdvisor.builder(chatMemory).conversationId(sessionId).build()).call()
+				.content();
+	}
+}

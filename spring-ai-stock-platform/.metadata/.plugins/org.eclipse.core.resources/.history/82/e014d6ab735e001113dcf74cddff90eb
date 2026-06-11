@@ -1,0 +1,22 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+import com.spring.ai.service.StockService;
+
+@Component
+public class CompanyTools {
+
+    private final StockService stockService;
+
+    public CompanyTools(StockService stockService) {
+        this.stockService = stockService;
+    }
+
+    @Tool(description = "Get company overview by stock symbol")
+    public String companyOverview(String symbol) {
+
+        return stockService.companyOverview(symbol);
+    }
+}

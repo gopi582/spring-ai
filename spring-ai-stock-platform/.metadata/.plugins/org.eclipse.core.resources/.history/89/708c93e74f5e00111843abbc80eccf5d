@@ -1,0 +1,20 @@
+package com.spring.ai.tools;
+
+import org.springframework.ai.tool.annotation.Tool;
+import org.springframework.stereotype.Component;
+
+@Component
+public class StockTools {
+
+    private final StockService stockService;
+
+    public StockTools(StockService stockService) {
+        this.stockService = stockService;
+    }
+
+    @Tool(description = "Get live stock price")
+    public String stockPrice(String symbol) {
+
+        return stockService.getPrice(symbol);
+    }
+}
